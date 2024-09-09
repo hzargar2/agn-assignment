@@ -6,7 +6,9 @@
     "dev": "npx nodemon app.js"
   },
   "dependencies": {
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
     "express": "~4.16.1",
     "nodemon": "^3.1.4"
   }

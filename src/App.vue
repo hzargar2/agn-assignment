@@ -11,7 +11,7 @@ onBeforeMount(async () => {
         alert("Failed to load csv file.");
     });
 
-    console.log(users.data);
+    console.log(users.employees);
 
 })
 
