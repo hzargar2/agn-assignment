@@ -11,10 +11,11 @@ router.get('/', function(req, res, next) {
 
   const records = parse(fileContents, {
     columns: true,
-    skip_empty_lines: true
+    skip_empty_lines: true,
+    cast: true
   });
 
-  res.send({employees: records});
+  res.send({data: records});
 });
 
 module.exports = router;
