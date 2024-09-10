@@ -20,11 +20,12 @@ onBeforeMount(async () => {
     employees.value = res.data.slice(0,100);
     attempted_to_load_file.value = true;
 
-    // memoization of data to generate parent child relationships
+    // generate parent child relationships map
     for (const [key, employee] of Object.entries(employees.value)){
 
         // if employee doesn't exist in the new map add it to it with empty children
         if (employee["Employee Id"] !== null && !(employee["Employee Id"] in employees_with_children)){
+            employee["Salary"] = Number(employee["Salary"].replace(/[^0-9.-]+/g,""));
             employees_with_children[employee["Employee Id"]] = {
                 current: employee,
                 children: []
@@ -55,7 +56,7 @@ onBeforeMount(async () => {
 <!--        Add root element in chart-->
         <div class="flex min-h-screen" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
             <div class="flex mt-32 m-auto w-fit h-fit">
-                <Employee :key="employees_with_children[0]['Employee Id']" :employee="employees_with_children[0]" />
+                <Employee :key="employees_with_children[0]['Employee Id']" :employee="employees_with_children[0]" :all_employees="employees_with_children" />
             </div>
         </div>
 
