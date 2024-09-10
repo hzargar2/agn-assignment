@@ -158,7 +158,7 @@ onBeforeMount(async () => {
 
 <!--        Add root element in chart-->
         <div class="flex min-h-screen" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
-            <div class="flex mt-32 w-fit h-fit">
+            <div class="flex mt-32 w-full h-full">
                 <Employee :key="employees_with_children[0].current['Employee Id']" :employee="employees_with_children[0]" :employees_with_children="employees_with_children" />
             </div>
         </div>
