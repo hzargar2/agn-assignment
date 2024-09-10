@@ -162,8 +162,5 @@ onBeforeMount(async () => {
                 <Employee :key="employees_with_children[0]['Employee Id']" :employee="employees_with_children[0]" :all_employees="employees_with_children" />
             </div>
         </div>
-
     </main>
-
-
 </template>
