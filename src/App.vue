@@ -28,7 +28,7 @@ onBeforeMount(async () => {
     });
 
     // get first 100 for now, optimize for large graph later
-    employees.value = res.data;
+    employees.value = res.data.slice(0,100);
     attempted_to_load_file.value = true;
 
     // uses memoization to generate parent child relationships map in linear time
@@ -53,7 +53,7 @@ onBeforeMount(async () => {
     // uses DFS to calculate descendant count so does it in linear time
     calculate_descendant_count(employees_with_children[0]);
 
-    console.log(Object.keys(employees_with_children).length);
+    console.log(employees_with_children);
 
 
 })
