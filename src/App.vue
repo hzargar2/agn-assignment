@@ -6,6 +6,17 @@ let employees = ref(null);
 let attempted_to_load_file = ref(false);
 let employees_with_children = {};
 
+const calculate_descendant_count = (root_employee) => {
+
+    let count = root_employee.children.length;
+
+    for (const [key, child] of Object.entries(root_employee.children)){
+        count = count + calculate_descendant_count(employees_with_children[child["Employee Id"]]);
+    }
+
+    root_employee.current["descendant_count"] = count;
+    return count;
+}
 
 onBeforeMount(async () => {
 
@@ -17,10 +28,10 @@ onBeforeMount(async () => {
     });
 
     // get first 100 for now, optimize for large graph later
-    employees.value = res.data.slice(0,100);
+    employees.value = res.data;
     attempted_to_load_file.value = true;
 
-    // generate parent child relationships map
+    // uses memoization to generate parent child relationships map in linear time
     for (const [key, employee] of Object.entries(employees.value)){
 
         // if employee doesn't exist in the new map add it to it with empty children
@@ -38,7 +49,12 @@ onBeforeMount(async () => {
         }
     }
 
-    console.log(employees_with_children);
+
+    // uses DFS to calculate descendant count so does it in linear time
+    calculate_descendant_count(employees_with_children[0]);
+
+    console.log(Object.keys(employees_with_children).length);
+
 
 })
 
