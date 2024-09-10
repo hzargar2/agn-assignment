@@ -13,7 +13,7 @@ let background_text = ref('');
 
 onBeforeMount(() => {
     if (props.employee["Department"] === "Operations and Logistics"){
-        background_color.value = "bg-[#32cd32] bg-opacity-20";
+        background_color.value = "bg-[#32cd32] bg-opacity-20 hover:bg-opacity-35";
         background_text.value = "bg-green-300";
     }
 })
@@ -21,7 +21,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <div :class="`flex flex-col max-w-64 p-4 gap-y-1 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 ${background_color}`">
+    <div :class="`flex flex-col max-w-64 p-4 gap-y-1 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer ${background_color}`">
         <span class="flex font-medium text-center mx-auto">{{employee["Name"]}}</span>
         <span class="flex text-center mx-auto text-gray-600 {{background_text}}">{{employee["Job Title"]}}</span>
         <div class="flex flex-row flex-wrap gap-1 justify-center text-sm">
