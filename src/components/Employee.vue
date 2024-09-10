@@ -30,9 +30,9 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-y-4">
+    <div class="flex-col gap-y-4 inline-flex w-full">
 
-        <div :class="`flex flex-col w-52 h-56 p-4 gap-y-1 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer ${background_color}`" @click="expanded = !expanded">
+        <div :class="`justify-center m-auto inline-flex flex-col w-52 h-56 p-4 gap-y-1 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer ${background_color}`" @click="expanded = !expanded">
             <span class="flex font-medium text-center mx-auto">{{props.employee.current["Name"]}}</span>
             <span class="flex text-center mx-auto text-gray-600 {{background_text}}">{{props.employee.current["Job Title"]}}</span>
             <div class="flex flex-row flex-wrap gap-1 justify-center text-sm">
@@ -45,11 +45,12 @@ onBeforeMount(() => {
             </div>
         </div>
 
-        <div v-if="expanded === true" class="flex flex-row gap-x-3">
+        <div v-if="expanded === true" class="flex-row gap-x-3 inline-flex justify-center m-auto">
             <div v-for="child in props.employee.children">
                 <Employee :key="child['Employee Id']" :employee="employees_with_children[child['Employee Id']]" :employees_with_children="employees_with_children"/>
             </div>
         </div>
+
     </div>
 
 
