@@ -30,9 +30,9 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-y-12 justify-center m-auto">
+    <div class="flex flex-col gap-y-16 justify-center m-auto">
 
-        <div :class="`justify-center m-auto flex flex-col w-52 h-56 p-4 gap-y-1 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer ${background_color}`" @click="expanded = !expanded">
+        <div :class="`justify-center m-auto flex flex-col w-48 h-56 p-4 gap-y-1 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer ${background_color}`" @click="expanded = !expanded">
             <span class="flex font-medium text-center mx-auto">{{props.employee.current["Name"]}}</span>
             <span class="flex text-center mx-auto text-gray-600 {{background_text}}">{{props.employee.current["Job Title"]}}</span>
             <div class="flex flex-row flex-wrap gap-1 justify-center text-sm">
