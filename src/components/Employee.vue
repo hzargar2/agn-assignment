@@ -45,7 +45,7 @@ onBeforeMount(() => {
             </div>
         </div>
 
-        <div v-if="expanded === true" class="justify-center m-auto flex flex-row gap-x-3 px-4">
+        <div v-if="expanded === true" class="justify-center m-auto flex flex-row gap-x-3 px-6">
             <div v-for="child in props.employee.children">
                 <Employee :key="child['Employee Id']" :employee="employees_with_children[child['Employee Id']]" :employees_with_children="employees_with_children"/>
             </div>
