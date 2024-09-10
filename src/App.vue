@@ -29,7 +29,7 @@ onBeforeMount(async () => {
             </span>
         </div>
 
-        <div class="flex flex-col" v-else-if="attempted_to_load_file === true && employees !== null">
+        <div class="flex flex-col gap-y-2" v-else-if="attempted_to_load_file === true && employees !== null">
             <Employee v-for="employee in employees" :key="employee['Employee ID']" :employee="employee" />
         </div>
 
