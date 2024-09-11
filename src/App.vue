@@ -167,7 +167,7 @@ onMounted(() => {
 
 <template>
     <main>
-        <div class="fixed z-20 top-0 left-0 space-x-4 p-4">
+        <div class="fixed z-20 top-0 right-0 space-x-4 py-6 px-12">
             <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomOut">-</button>
             <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomIn">+</button>
         </div>
