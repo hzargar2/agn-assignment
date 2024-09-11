@@ -180,7 +180,7 @@ onMounted(() => {
         </div>
 
 <!--        Add root element in chart-->
-        <div id="zoomtext" class="flex min-h-screen mt-32 w-full h-full" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
+        <div id="zoomtext" class="flex min-h-screen mt-12 w-full h-full" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
             <div class="absolute left-0 right-0 pb-72">
                 <Employee :key="employees_with_children[0].current['Employee Id']" :employee="employees_with_children[0]" :employees_with_children="employees_with_children" />
             </div>
