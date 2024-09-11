@@ -66,7 +66,7 @@ onBeforeMount(() => {
                 <span class="flex text-center mx-auto text-gray-600 {{background_text}}">{{props.employee.current["Job Title"]}}</span>
             </div>
 
-            <div class="flex flex-col gap-1 mb-0 m-auto text-sm">
+            <div class="flex flex-col gap-1 mb-0 m-auto text-sm animate-fade animate-duration-700 animate-normal">
 <!--                Calculate numeric values for styling inline-->
                 <span :class="`flex text-center px-2 py-0.5 rounded-2xl m-auto border-2 border-gray-800 border-opacity-60 ${background_text}`">{{props.employee.current["Department"]}}</span>
                 <span :class="`flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}`">Level {{props.employee.current["level"]}}</span>

@@ -9,6 +9,7 @@
     "preview": "npm run dev --prefix ./server/ & vite preview"
   },
   "dependencies": {
+    "tailwindcss-animated": "^1.1.2",
     "vue": "^3.4.29"
   },
   "devDependencies": {

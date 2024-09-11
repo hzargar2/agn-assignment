@@ -2,3 +2,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    background-size: 40px 40px;
+    opacity: 50;
+    background-image: radial-gradient(circle, #AEAEAE 1px, rgba(197, 197, 197, 0.4) 1px);
+}
