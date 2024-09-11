@@ -9,13 +9,20 @@ const fileContents = fs.readFileSync('./test_data.csv').toString();
 /* GET users listing. */
 router.get('/', function(req, res, next) {
 
-  const records = parse(fileContents, {
-    columns: true,
-    skip_empty_lines: true,
-    cast: true
-  });
+  try {
+    const records = parse(fileContents, {
+      columns: true,
+      skip_empty_lines: true,
+      cast: true
+    });
 
-  res.send({data: records});
+    res.status(200);
+    res.send({data: records});
+  }catch (e){
+    res.status(424);
+  }
+
+
 });
 
 module.exports = router;

@@ -1,169 +1,58 @@
 <script setup>
 import Employee from "@/components/Employee.vue";
-import {onBeforeMount, onMounted, ref} from "vue";
+import {onBeforeMount, onMounted, onUpdated, reactive, ref} from "vue";
+import {create_graph_at_element_id} from "@/assets/tree.js";
+import {zoom} from "@/assets/zoom.js";
+import {create_employee_and_children_map} from "@/assets/data.js";
+import {
+    calculate_descendant_count,
+    calculate_ic_cost,
+    calculate_management_cost, calculate_management_cost_ratio,
+    calculate_total_cost
+} from "@/assets/metrics.js";
+import EmployeeTree from "@/components/EmployeeTree.vue";
 
 let employees = ref(null);
-let attempted_to_load_file = ref(false);
+let data_ready = ref(false);
+let failed_to_fetch_data = ref(false);
 let employees_with_children = {};
 
-const calculate_descendant_count = (root_employee) => {
+onMounted(async () => {
 
-    let count = root_employee.children.length;
+    let res = await fetch("http://localhost:3000/employees");
 
-    for (const [key, child] of Object.entries(root_employee.children)){
-        count = count + calculate_descendant_count(employees_with_children[child["Employee Id"]]);
+    // set status so can show error message to user
+    if (res.status !== 200){
+        failed_to_fetch_data.value = true;
     }
 
-    root_employee.current["descendant_count"] = count;
-    return count;
-}
-
-const calculate_management_cost = (root_employee) => {
-
-    let salary_sum = 0;
-
-    for (const [key, child] of Object.entries(root_employee.children)){
-        salary_sum = salary_sum + child["Salary"] + calculate_management_cost(employees_with_children[child["Employee Id"]]);
-    }
-
-    root_employee.current["management_cost"] = salary_sum;
-    return salary_sum;
-}
-
-const calculate_ic_cost = (root_employee) => {
-
-    let salary_sum = 0;
-
-    if (root_employee.children.length === 0){
-        salary_sum = root_employee.current["Salary"]
-    }
-
-    for (const [key, child] of Object.entries(root_employee.children)){
-        salary_sum = salary_sum + calculate_ic_cost(employees_with_children[child["Employee Id"]]);
-    }
-
-    root_employee.current["ic_cost"] = salary_sum;
-    return salary_sum;
-}
-
-const calculate_total_cost = (root_employee) => {
-
-    let salary_sum = root_employee.current["Salary"];
-
-    for (const [key, child] of Object.entries(root_employee.children)){
-        salary_sum = salary_sum + child["Salary"] + calculate_total_cost(employees_with_children[child["Employee Id"]]);
-    }
-
-    root_employee.current["total_cost"] = salary_sum;
-    return salary_sum;
-}
-
-// assume this is ratio of ic salaries to manager salaries and not the ration of their counts. If counts, comment this and uncomment bottom instead.
-const calculate_management_cost_ratio = (root_employee) => {
-
-    for (const [key, child] of Object.entries(root_employee.children)){
-        calculate_management_cost_ratio(employees_with_children[child["Employee Id"]]);
-    }
-
-    root_employee.current["management_cost_ratio"] = root_employee.current["ic_cost"]/root_employee.current["management_cost"];
-}
-
-// const calculate_management_cost_ratio = (root_employee) => {
-//
-//     let manager = 0;
-//
-//     if (root_employee.children.length > 0){
-//         manager++;
-//     }
-//
-//     let ic = 0;
-//
-//     if (root_employee.children.length === 0){
-//         ic++;
-//     }
-//
-//     for (const [key, child] of Object.entries(root_employee.children)){
-//         let counts = calculate_management_cost_ratio(employees_with_children[child["Employee Id"]]);
-//         manager = manager + counts[0];
-//         ic = ic + counts[1];
-//     }
-//
-//     root_employee.current["manager_count"] = manager;
-//     root_employee.current["ic_count"] = ic;
-//     root_employee.current["management_cost_ratio"] = ic/manager;
-//     return [manager, ic];
-// }
-
-
-
-
-
-
-
-onBeforeMount(async () => {
-
-    // get csv data from API
-    let res = await fetch("http://localhost:3000/employees").then(async (res) => {
-        return await res.json();
-    }).catch((e) => {
-        alert("Failed to load csv file.");
-    });
+    let res_data_as_json = await res.json();
 
     // get first 100 for now, optimize for large graph later
-    employees.value = res.data.slice(0,100);
-    attempted_to_load_file.value = true;
+    employees.value = res_data_as_json.data.slice(0, 100);
 
-    // uses memoization to generate parent child relationships map in linear time
-    for (const [key, employee] of Object.entries(employees.value)){
+    // creates employees with children, needed to be able to calculate metrics efficiently
+    employees_with_children = create_employee_and_children_map(employees.value);
 
-        // if employee doesn't exist in the new map add it to it with empty children
-        if (employee["Employee Id"] !== null && !(employee["Employee Id"] in employees_with_children)){
-            employee["Salary"] = Number(employee["Salary"].replace(/[^0-9.-]+/g,""));
-            employees_with_children[employee["Employee Id"]] = {
-                current: employee,
-                children: []
-            }
-        }
-
-        // if the manager of the current node exists add the current employee to the children of that manager
-        if (employee["Manager"] !== null && employee["Manager"] in employees_with_children){
-            employees_with_children[employee["Manager"]].children.push(employee);
-        }
-    }
-
-
-    // uses DFS to calculate descendant count so does it in linear time
-    calculate_descendant_count(employees_with_children[0]);
-    calculate_management_cost(employees_with_children[0]);
-    calculate_ic_cost(employees_with_children[0]);
-    calculate_total_cost(employees_with_children[0]);
-    calculate_management_cost_ratio(employees_with_children[0]);
-
+    // calculate employee metrics
+    calculate_descendant_count(employees_with_children[0], employees_with_children);
+    calculate_management_cost(employees_with_children[0], employees_with_children);
+    calculate_ic_cost(employees_with_children[0], employees_with_children);
+    calculate_total_cost(employees_with_children[0], employees_with_children);
+    calculate_management_cost_ratio(employees_with_children[0], employees_with_children);
 
     console.log(employees_with_children);
+    // set flag to update DOM
+    data_ready.value = true;
 
+    // create Zoom button event listeners on mount
+    zoom(1, 0.2, "zoomIn", "zoomOut", "zoomtext");
 
-})
-
-
-// create Zoom button event listeners on mount
-onMounted(() => {
-    let zoom = 1;
-    let zoomStep = 0.2;
-
-    document.getElementById("zoomIn").addEventListener("click", function() {
-        zoom += zoomStep;
-        document.getElementById("zoomtext").style.transform = "scale(" + zoom + ")";
-    });
-    document.getElementById("zoomOut").addEventListener("click", function() {
-        if (zoom > zoomStep) {
-            zoom -= zoomStep;
-            document.getElementById("zoomtext").style.transform = "scale(" + zoom + ")";
-        }
-    });
+    create_graph_at_element_id("#tree-graph");
 })
 
 </script>
+
 
 <template>
     <main>
@@ -172,17 +61,24 @@ onMounted(() => {
             <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomIn">+</button>
         </div>
 
-        <div class="flex w-screen h-screen" v-if="attempted_to_load_file === true && employees_with_children == null">
+        <div class="flex w-screen h-screen" v-if="failed_to_fetch_data && data_ready">
             <span class="flex gap-y-4 flex-col w-fit h-fit m-auto text-center p-4 bg-red-500 bg-opacity-90 text-slate-100 rounded-xl">
                 <span class="text-4xl">Failed to load CSV file</span>
                 <span class="text-2xl">Go to http://localhost:3000/employees to see if there is a response.</span>
             </span>
         </div>
 
-<!--        Add root element in chart-->
-        <div id="zoomtext" class="flex min-h-screen mt-12 w-full h-full" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
+        <div class="flex w-screen h-screen" v-else-if="!failed_to_fetch_data && !data_ready">
+            <span class="flex gap-y-4 flex-col w-fit h-fit m-auto text-center p-4 bg-red-500 bg-opacity-90 text-slate-100 rounded-xl">
+                <span class="text-4xl">Loading...</span>
+            </span>
+        </div>
+
+        <!--        Add root element in chart-->
+        <div id="zoomtext" class="flex min-h-screen mt-12 w-full h-full" v-else>
             <div class="absolute left-0 right-0 pb-72">
-                <Employee :key="employees_with_children[0].current['Employee Id']" :employee="employees_with_children[0]" :employees_with_children="employees_with_children" />
+<!--                Need to use separate component to render tree since we need parent div to render before chart javascript cna inject html into DOM  -->
+                <EmployeeTree/>
             </div>
         </div>
     </main>
@@ -193,5 +89,20 @@ onMounted(() => {
     #zoomtext {
         transform: scale(1);
         transition: transform 0.2s ease-in-out;
+    }
+    .node circle {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 3px;
+    }
+
+    .node text {
+        font: 12px sans-serif;
+    }
+
+    .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 2px;
     }
 </style>
