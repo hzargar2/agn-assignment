@@ -19,7 +19,7 @@ let background_text = ref('');
 
 onBeforeMount(() => {
     if (props.employee.current["Department"] === "Operations and Logistics"){
-        background_color.value = "bg-[#32cd32] bg-opacity-20 hover:bg-opacity-35";
+        background_color.value = "bg-[#32cd33] bg-opacity-20 hover:bg-opacity-35";
         background_text.value = "bg-green-300";
     }else{
         background_color.value = "bg-white hover:bg-gray-100";
