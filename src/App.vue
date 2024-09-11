@@ -1,6 +1,6 @@
 <script setup>
 import Employee from "@/components/Employee.vue";
-import {onBeforeMount, ref} from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 
 let employees = ref(null);
 let attempted_to_load_file = ref(false);
@@ -145,10 +145,33 @@ onBeforeMount(async () => {
 
 })
 
+
+// create Zoom button event listeners on mount
+onMounted(() => {
+    let zoom = 1;
+    let zoomStep = 0.2;
+
+    document.getElementById("zoomIn").addEventListener("click", function() {
+        zoom += zoomStep;
+        document.getElementById("zoomtext").style.transform = "scale(" + zoom + ")";
+    });
+    document.getElementById("zoomOut").addEventListener("click", function() {
+        if (zoom > zoomStep) {
+            zoom -= zoomStep;
+            document.getElementById("zoomtext").style.transform = "scale(" + zoom + ")";
+        }
+    });
+})
+
 </script>
 
 <template>
     <main>
+        <div class="fixed z-20 top-0 left-0 space-x-4 p-4">
+            <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomOut">-</button>
+            <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomIn">+</button>
+        </div>
+
         <div class="flex w-screen h-screen" v-if="attempted_to_load_file === true && employees_with_children == null">
             <span class="flex gap-y-4 flex-col w-fit h-fit m-auto text-center p-4 bg-red-500 bg-opacity-90 text-slate-100 rounded-xl">
                 <span class="text-4xl">Failed to load CSV file</span>
@@ -157,10 +180,18 @@ onBeforeMount(async () => {
         </div>
 
 <!--        Add root element in chart-->
-        <div class="flex min-h-screen mt-32 w-full h-full" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
+        <div id="zoomtext" class="flex min-h-screen mt-32 w-full h-full" v-else-if="attempted_to_load_file === true && employees_with_children !== null">
             <div class="absolute left-0 right-0 pb-72">
                 <Employee :key="employees_with_children[0].current['Employee Id']" :employee="employees_with_children[0]" :employees_with_children="employees_with_children" />
             </div>
         </div>
     </main>
 </template>
+
+<style>
+
+    #zoomtext {
+        transform: scale(1);
+        transition: transform 0.2s ease-in-out;
+    }
+</style>
