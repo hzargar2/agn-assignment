@@ -1,24 +1,6 @@
 import * as d3 from "d3";
 
-export const create_graph_at_element_id = (root_id) => {
-
-    let treeData = {
-        name: "Top Level",
-        children: [{
-            name: "Level 2: A",
-            children: [{
-                name: "Son of A",
-            },
-                {
-                    name: "Daughter of A",
-                },
-            ],
-        },
-            {
-                name: "Level 2: B",
-            },
-        ],
-    };
+export const create_graph_at_element_id = (root_id, raw_json) => {
 
     // Set the dimensions and margins of the diagram
     let margin = {
@@ -46,13 +28,15 @@ export const create_graph_at_element_id = (root_id) => {
     // declares a tree layout and assigns the size
     let treemap = d3.tree().size([width, height]);
 
-    // Assigns parent, children, height, depth
-    root = d3.hierarchy(treeData, function(d) {
-        return d.children;
-    });
+    root = d3.stratify()
+        .id((d) => d["Employee Id"])
+        .parentId((d) => d["Manager"])
+        (raw_json);
+
     root.x0 = height / 2;
     root.y0 = 0;
 
+    collapse(root);
     update(root);
 
     // Collapse the node and all it's children
@@ -114,7 +98,7 @@ export const create_graph_at_element_id = (root_id) => {
                 return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-                return d.data.name;
+                return d.data.value;
             });
 
         // UPDATE

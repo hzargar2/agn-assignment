@@ -41,14 +41,12 @@ onMounted(async () => {
     calculate_total_cost(employees_with_children[0], employees_with_children);
     calculate_management_cost_ratio(employees_with_children[0], employees_with_children);
 
-    console.log(employees_with_children);
+    // console.log(employees_with_children);
     // set flag to update DOM
     data_ready.value = true;
 
     // create Zoom button event listeners on mount
     zoom(1, 0.2, "zoomIn", "zoomOut", "zoomtext");
-
-    create_graph_at_element_id("#tree-graph");
 })
 
 </script>
@@ -83,7 +81,7 @@ the html into the DOM but not here. DOM updates after onMounted is run so if jav
 it won;t work since DOM hasn't updated yet to include the div that contains the child element but if run the javascript
 in a separate file where element is already rendered (e no conditional rendering then can javascript can inject html
 and update the DOM successfully  -->
-                <EmployeeTree/>
+                <EmployeeTree :employees_json="employees"/>
             </div>
         </div>
     </main>
