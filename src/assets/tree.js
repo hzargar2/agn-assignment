@@ -22,10 +22,10 @@ export const create_graph_at_element_id = (root_id) => {
 
     // Set the dimensions and margins of the diagram
     let margin = {
-            top: 0,
-            right: 90,
-            bottom: 30,
-            left: 90,
+            top: 20,
+            right: 0,
+            bottom: 0,
+            left: 0,
         },
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;

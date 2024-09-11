@@ -75,8 +75,8 @@ onMounted(async () => {
         </div>
 
         <!--        Add root element in chart-->
-        <div id="zoomtext" class="flex min-h-screen mt-12 w-full h-full" v-else>
-            <div class="absolute left-0 right-0 pb-72">
+        <div id="zoomtext" class="flex min-h-screen mt-32 w-full h-full" v-else>
+            <div class="flex justify-center m-auto pb-72">
 <!--                Need to use a separate component to render D3 tree since we need parent div to render before chart
 javascript can inject html into DOM, div in component is not conditionally rendered so javascript function can inject
 the html into the DOM but not here. DOM updates after onMounted is run so if javascript is executed in this component
