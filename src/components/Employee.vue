@@ -19,38 +19,38 @@ let background_text = ref('');
 
 onBeforeMount(() => {
     if (props.employee.current["Department"].toLowerCase().includes("operations")){
-        background_color.value = "bg-[#32cd33] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#84E184] bg-opacity-60";
+        background_color.value = "bg-lime-50 hover:bg-lime-100";
+        background_text.value = "bg-lime-200";
     }else if (props.employee.current["Department"].toLowerCase().includes("sales")) {
-        background_color.value = "bg-[#43A6C6] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#67B7D1] bg-opacity-60";
+        background_color.value = "bg-emerald-50 hover:bg-emerald-100";
+        background_text.value = "bg-emerald-200";
     }else if (props.employee.current["Department"].toLowerCase().includes("data analytics")) {
-        background_color.value = "bg-[#43A6C6] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#67B7D1] bg-opacity-60";
+        background_color.value = "bg-teal-50 hover:bg-teal-100";
+        background_text.value = "bg-teal-200";
     }
     else if (props.employee.current["Department"].toLowerCase().includes("customer support")) {
-        background_color.value = "bg-[#FFBE7C] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#FFA74F] bg-opacity-40";
+        background_color.value = "bg-cyan-50 hover:bg-cyan-100";
+        background_text.value = "bg-cyan-200";
     }
     else if (props.employee.current["Department"].toLowerCase().includes("system")) {
-        background_color.value = "bg-[#FF8A8A] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#FF5C5C] bg-opacity-40";
+        background_color.value = "bg-indigo-50 hover:bg-indigo-100";
+        background_text.value = "bg-indigo-200";
     }
     else if (props.employee.current["Department"].toLowerCase().includes("project")) {
-        background_color.value = "bg-[#D396FF] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#BF68FF] bg-opacity-40";
+        background_color.value = "bg-purple-50 hover:bg-purple-100";
+        background_text.value = "bg-purple-200";
     }
     else if (props.employee.current["Department"].toLowerCase().includes("human resources")) {
-        background_color.value = "bg-[#F5F5DC] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#EBEBB8] bg-opacity-40";
+        background_color.value = "bg-rose-50 hover:bg-rose-100";
+        background_text.value = "bg-rose-200";
     }
     else if (props.employee.current["Department"].toLowerCase().includes("software")) {
-        background_color.value = "bg-[#F5F5DC] bg-opacity-20 hover:bg-opacity-35";
-        background_text.value = "bg-[#EBEBB8] bg-opacity-40";
+        background_color.value = "bg-amber-50 hover:bg-amber-100";
+        background_text.value = "bg-amber-200";
     }
     else{
-        background_color.value = "bg-white hover:bg-gray-100";
-        background_text.value = "bg-gray-200";
+        background_color.value = "bg-stone-50 hover:bg-stone-100";
+        background_text.value = "bg-stone-200";
     }
 })
 
