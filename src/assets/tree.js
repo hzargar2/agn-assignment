@@ -4,7 +4,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
 
     // Set the dimensions and margins of the diagram
     let margin = {
-            top: 20,
+            top: 170,
             right: 0,
             bottom: 0,
             left: 0,
@@ -23,7 +23,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    let i = 0, duration = 750, root;
+    let i = 0, duration = 300, root;
 
     // declares a tree layout and assigns the size
     let treemap = d3.tree().size([width, height]);
@@ -49,12 +49,50 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
     }
 
     function update(source) {
+
+
+
+
+        // compute the new height
+        var levelWidth = [1];
+        var childCount = function(level, n) {
+            if(n.children && n.children.length > 0) {
+                if(levelWidth.length <= level + 1) levelWidth.push(0);
+                levelWidth[level+1] += n.children.length;
+                n.children.forEach(function(d) {
+                    childCount(level + 1, d);
+                });
+            }
+        };
+
+        childCount(0, root);
+
+        let newHeight = d3.max(levelWidth) * 100; // 20 pixels per line
+        let newWidth = d3.max(levelWidth) * 200; // 20 pixels per line
+
+        treemap = treemap.size([newWidth, newHeight]);
+
+        d3.select("svg").remove();//TO REMOVE THE ALREADY SVG CONTENTS AND RELOAD ON EVERY UPDATE
+
+        svg = d3
+            .select(root_id)
+            .append("svg")
+            .attr("width", newWidth + margin.right + margin.left)
+            .attr("height", newHeight + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+
+
+
         // Assigns the x and y position for the nodes
-        let treeData = treemap(root);
+        treemap(root);
 
         // Compute the new tree layout.
-        let nodes = treeData.descendants(),
-            links = treeData.descendants().slice(1);
+        let nodes = root.descendants(),
+            links = root.descendants().slice(1);
 
         // Normalize for fixed-depth.
         nodes.forEach(function(d) {
@@ -98,7 +136,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
                 return d.children || d._children ? "end" : "start";
             })
             .text(function(d) {
-                return d.data.value;
+                return d.data["Employee Id"];
             });
 
         // UPDATE
