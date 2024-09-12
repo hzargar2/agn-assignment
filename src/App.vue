@@ -29,7 +29,7 @@ onMounted(async () => {
     let res_data_as_json = await res.json();
 
     // get first 100 for now, optimize for large graph later
-    employees.value = res_data_as_json.data.slice(0, 500);
+    employees.value = res_data_as_json.data.slice(0, 1000);
 
     // creates employees with children, needed to be able to calculate metrics efficiently
     employees_with_children = create_employee_and_children_map(employees.value);
@@ -92,24 +92,8 @@ and update the DOM successfully  -->
 </template>
 
 <style>
-
     #zoomtext {
         transform: scale(1);
         transition: transform 0.2s ease-in-out;
-    }
-    .node circle {
-        fill: #fff;
-        stroke: steelblue;
-        stroke-width: 3px;
-    }
-
-    .node text {
-        font: 12px sans-serif;
-    }
-
-    .link {
-        fill: none;
-        stroke: #ccc;
-        stroke-width: 2px;
     }
 </style>

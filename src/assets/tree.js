@@ -7,6 +7,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
     const marginBottom = 10;
     const marginRight = 10;
     const marginTop = 40;
+    const radius = 5.5;
 
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
@@ -30,7 +31,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         .append("svg")
         .attr("width", dx)
         .attr("height", dy)
-        .attr("viewBox", [0, 0, dx, dy]);
+        .attr("viewBox", [0, 0, dx*2, dy]);
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -99,11 +100,22 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
                 update(event, d);
             });
 
+        nodeEnter.html((d) => {
+            return `
+                <foreignObject x="-120" y="0" width="240" height="320">
+                    <div :class="flex flex-col w-60 h-80 p-4 gap-y-2 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer bg-white">
+                        <div class="flex flex-col gap-y-1 mt-0 m-auto">
+                            <span class="flex font-medium mx-auto">${d.data["Name"]} ${d.data["Employee Id"]}</span>
+                            <span class="flex text-center mx-auto text-gray-600 {{background_text}}">${d.data["Job Title"]}</span>
+                        </div>
+                    </div>
+                </foreignObject>`;
+        });
 
-        // sets the color of the node circle
-        nodeEnter.append("circle")
-            .attr("r", 5.5)
-            .attr("fill", d => d._children ? "#555" : "#999");
+        // // sets the color of the node circle
+        // nodeEnter.append("circle")
+        //     .attr("r", 5.5)
+        //     .attr("fill", d => d._children ? "#555" : "#999");
 
         // sets the text beside the nodes
         nodeEnter.append("text")
