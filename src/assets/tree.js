@@ -3,7 +3,6 @@ import * as d3 from "d3";
 export const create_graph_at_element_id = (root_id, raw_json) => {
 
     // Specify the charts’ dimensions. The height is variable, depending on the layout.
-    const width = 928;
     const marginLeft = 10;
     const marginBottom = 10;
     const marginRight = 10;
@@ -17,19 +16,21 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         .parentId((d) => d["Manager"])
         (raw_json);
 
-    const dx = 50;
-    const dy = (width - marginRight - marginLeft) / (1 + root.height);
+    // this is the size of each individual node
+    const dx = 240;
+    const dy = 320;
 
     // Define the tree layout and the shape for links.
     const tree = d3.tree().nodeSize([dx, dy]);
+    // create vertical paths from parents to children
     const diagonal = d3.linkVertical().y(d => d.y).x(d => d.x);
 
-    // Create the SVG container, a layer for the links and a layer for the nodes.
-    const svg = d3.select(root_id).append("svg")
-        .attr("width", width)
-        .attr("height", dx)
-        .attr("viewBox", [-marginLeft, -marginTop, width, dx])
-        .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif; user-select: none;");
+    // Create the SVG container, a layer for the links and a layer for the nodes. Set initialize size to the size of 1 node
+    const svg = d3.select(root_id)
+        .append("svg")
+        .attr("width", dx)
+        .attr("height", dy)
+        .attr("viewBox", [0, 0, dx, dy]);
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -50,28 +51,38 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         }
     }
 
+    // run every time we want to update tree state
     function update(event, source) {
-        const duration = event?.altKey ? 2500 : 250; // hold the alt key to slow down the transition
+
+        const duration = 250; // hold the alt key to slow down the transition
         const nodes = root.descendants().reverse();
         const links = root.links();
 
         // Compute the new tree layout.
         tree(root);
 
+        // find the top most node, the bottom most node, the most right node, and the most left node
         let top = root;
         let bottom = root;
+        let left = root;
+        let right = root;
         root.eachBefore(node => {
+            if (node.x < left.x) left = node;
+            if (node.x > right.x) right = node;
             if (node.y < top.y) top = node;
             if (node.y > bottom.y) bottom = node;
         });
 
+        // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
         const height = bottom.y - top.y + marginTop + marginBottom;
-        const width = root.height;
+        // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
+        const width = right.x - left.x + marginLeft + marginRight;
 
         const transition = svg.transition()
             .duration(duration)
             .attr("height", height)
-            .attr("viewBox", [-marginLeft, top.x - marginTop, width, height])
+            .attr("width", width)
+            .attr("viewBox", [0, 0, width, height])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
@@ -88,32 +99,28 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
                 update(event, d);
             });
 
-        nodeEnter.append("circle")
-            .attr("r", 2.5)
-            .attr("fill", d => d._children ? "#555" : "#999")
-            .attr("stroke-width", 10);
 
+        // sets the color of the node circle
+        nodeEnter.append("circle")
+            .attr("r", 5.5)
+            .attr("fill", d => d._children ? "#555" : "#999");
+
+        // sets the text beside the nodes
         nodeEnter.append("text")
             .attr("dy", "0.31em")
-            .attr("x", d => d._children ? -6 : 6)
+            .attr("x", d => d._children ? -8 : 8)
             .attr("text-anchor", d => d._children ? "end" : "start")
-            .text(d => d.data["Employee Id"])
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-width", 3)
-            .attr("stroke", "white")
-            .attr("paint-order", "stroke");
+            .text(d => d.data["Employee Id"]);
 
         // Transition nodes to their new position.
         const nodeUpdate = node.merge(nodeEnter).transition(transition)
             .attr("transform", d => `translate(${d.x},${d.y})`)
-            .attr("fill-opacity", 1)
-            .attr("stroke-opacity", 1);
+            .attr("fill-opacity", 1);
 
         // Transition exiting nodes to the parent's new position.
         const nodeExit = node.exit().transition(transition).remove()
-            .attr("transform", d => `translate(${source.y},${source.x})`)
-            .attr("fill-opacity", 0)
-            .attr("stroke-opacity", 0);
+            .attr("transform", d => `translate(${source.x},${source.y})`)
+            .attr("fill-opacity", 0);
 
         // Update the links…
         const link = gLink.selectAll("path")
@@ -146,15 +153,15 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
 
     // Do the first update to the initial configuration of the tree — where a number of nodes
     // are open (arbitrarily selected as the root, plus nodes with 7 letters).
-    root.x0 = dy / 2;
-    root.y0 = 0;
+    root.y0 = dy / 2;
+    root.x0 = dx / 2;
     root.descendants().forEach((d, i) => {
         d.id = i;
         d._children = d.children;
-        if (d.depth && d.data["Employee Id"].length !== 7) d.children = null;
+        if (d.depth) d.children = null;
     });
 
-    collapse(root)
+    // collapse(root)
     update(null, root);
 
     return svg.node();
