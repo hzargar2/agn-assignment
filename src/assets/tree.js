@@ -31,7 +31,8 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         .append("svg")
         .attr("width", dx)
         .attr("height", dy)
-        .attr("viewBox", [0, 0, dx*2, dy]);
+        .attr("viewBox", [0, 0, dx + marginLeft + marginRight, dy + marginTop + marginBottom])
+        .attr("style", "min-width: 100%; font: 10px sans-serif;");
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -75,15 +76,15 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         });
 
         // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
-        const height = bottom.y - top.y + marginTop + marginBottom;
+        const height = bottom.y - top.y + marginTop + marginBottom + 320;
         // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
-        const width = right.x - left.x + marginLeft + marginRight;
+        const width = right.x - left.x + marginLeft + marginRight + 240;
 
         const transition = svg.transition()
             .duration(duration)
-            .attr("height", height)
-            .attr("width", width)
-            .attr("viewBox", [0, 0, width, height])
+            .attr("width", d3.max([width, dx]))
+            .attr("height",  d3.max([height, dy]))
+            .attr("viewBox", [-width/2, top.x - marginTop, width, height])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
@@ -103,7 +104,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         nodeEnter.html((d) => {
             return `
                 <foreignObject x="-120" y="0" width="240" height="320">
-                    <div :class="flex flex-col w-60 h-80 p-4 gap-y-2 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer bg-white">
+                    <div :class="flex flex-col p-4 gap-y-2 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer bg-white">
                         <div class="flex flex-col gap-y-1 mt-0 m-auto">
                             <span class="flex font-medium mx-auto">${d.data["Name"]} ${d.data["Employee Id"]}</span>
                             <span class="flex text-center mx-auto text-gray-600 {{background_text}}">${d.data["Job Title"]}</span>
@@ -166,7 +167,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
     // Do the first update to the initial configuration of the tree — where a number of nodes
     // are open (arbitrarily selected as the root, plus nodes with 7 letters).
     root.y0 = dy / 2;
-    root.x0 = dx / 2;
+    root.x0 = 0;
     root.descendants().forEach((d, i) => {
         d.id = i;
         d._children = d.children;
