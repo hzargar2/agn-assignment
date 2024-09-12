@@ -29,7 +29,7 @@ onMounted(async () => {
     let res_data_as_json = await res.json();
 
     // get first 100 for now, optimize for large graph later
-    employees.value = res_data_as_json.data.slice(0, 100);
+    employees.value = res_data_as_json.data.slice(0, 500);
 
     // creates employees with children, needed to be able to calculate metrics efficiently
     employees_with_children = create_employee_and_children_map(employees.value);
