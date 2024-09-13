@@ -144,8 +144,8 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         // construct employee html using a foreignObject element and append it to the node since can;t append
         // div directly as a child of SVG element
         nodeEnter.html((node) => {
-            // console.log(node)
-            return construct_employee_html(node.data, dx, dy);
+            console.log(node)
+            return construct_employee_html(node, dx, dy);
         });
 
         // // sets the color of the node circle

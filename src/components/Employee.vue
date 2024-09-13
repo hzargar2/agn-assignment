@@ -8,8 +8,6 @@ let props = defineProps({
     }
 })
 
-let expanded = ref(false);
-
 let background_color = ref('');
 let background_text = ref('');
 
