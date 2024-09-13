@@ -1,7 +1,5 @@
 <script setup>
-import Employee from "@/components/Employee.vue";
-import {onBeforeMount, onMounted, onUpdated, reactive, ref} from "vue";
-import {create_graph_at_element_id} from "@/assets/tree.js";
+import {onBeforeMount, onMounted, ref} from "vue";
 import {zoom} from "@/assets/zoom.js";
 import {create_employee_and_children_map} from "@/assets/data.js";
 import {
@@ -17,7 +15,7 @@ let data_ready = ref(false);
 let failed_to_fetch_data = ref(false);
 let employees_with_children = {};
 
-onMounted(async () => {
+onBeforeMount(async () => {
 
     let res = await fetch("http://localhost:3000/employees");
 
