@@ -1,5 +1,6 @@
 import * as d3 from "d3";
-import {construct_employee_html} from "@/assets/employee.js";
+import {createApp} from "vue";
+import Employee from "@/components/Employee.vue";
 
 export const create_graph_at_element_id = (root_id, raw_json) => {
 
@@ -144,8 +145,14 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         // construct employee html using a foreignObject element and append it to the node since can;t append
         // div directly as a child of SVG element
         nodeEnter.html((node) => {
-            console.log(node)
-            return construct_employee_html(node, dx, dy);
+            let elm = document.createElement('foreignObject');
+            elm.setAttribute("x", -120);
+            elm.setAttribute("y", 0);
+            elm.setAttribute("width", dx);
+            elm.setAttribute("height", dy);
+
+            createApp(Employee, {employee: node}).mount(elm);
+            return elm.outerHTML;
         });
 
         // // sets the color of the node circle
