@@ -26,6 +26,10 @@ onMounted(() => {
     const marginRight = 10;
     const marginTop = 40;
     const radius = 5.5;
+    const horizontal_separation_factor_for_same_parent = 1.1
+    const horizontal_separation_factor_for_different_parent = 1.5
+    const vertical_separation_of_levels_in_px = 400
+    const shadow_px_room_for_each_node = 10;
 
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
@@ -36,12 +40,12 @@ onMounted(() => {
         (props.employees_json);
 
     // this is the size of each individual node
-    const dx = 240;
-    const dy = 340;
+    const dx = 240 + shadow_px_room_for_each_node;
+    const dy = 320 + shadow_px_room_for_each_node;
 
     // Define the tree layout and the shape for links.
     const tree = d3.tree().nodeSize([dx, dy])
-        .separation(function(a, b) { return (a.parent == b.parent ? 1.1 : 1.5); });
+        .separation(function(a, b) { return (a.parent == b.parent ? horizontal_separation_factor_for_same_parent : horizontal_separation_factor_for_different_parent); });
     // create vertical paths from parents to children
     const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
 
@@ -112,7 +116,7 @@ onMounted(() => {
 
         // Normalize for fixed-depth.
         nodes.forEach(function(node) {
-            node.y = node.depth * 400;
+            node.y = node.depth * vertical_separation_of_levels_in_px;
         });
 
         // find the top most node, the bottom most node, the most right node, and the most left node
@@ -130,7 +134,7 @@ onMounted(() => {
         // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
         let height = bottom.y - top.y + dy;
         // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
-        let width = right.x - left.x + dx;
+        let width = right.x - left.x + dx*2;
 
         console.log(bottom.y - top.y + dy)
         console.log(right.x, left.x, right.x - left.x)
@@ -150,8 +154,7 @@ onMounted(() => {
         // Enter any new nodes at the parent's previous position.
         const nodeEnter = node.enter().append("g")
             .attr("transform", node => `translate(${source.x0},${source.y0})`)
-            .attr("fill-opacity", 0)
-            .attr("stroke-opacity", 0)
+            .classed("group", true) // triggers on hover styling in Employee component, useful since want to change styling even if the node is hovered on since the shadow is part of the node, can't put shadow outside node
             .on("click", (event, node) => {
                 node.children = node.children ? null : node._children;
                 update(event, node);
@@ -161,6 +164,7 @@ onMounted(() => {
         // construct employee html using a foreignObject element and append it to the node since can;t append
         // div directly as a child of SVG element
         nodeEnter.html((node) => {
+            console.log(node)
             let elm = document.createElement('foreignObject');
             elm.setAttribute("x", -120);
             elm.setAttribute("y", 0);
