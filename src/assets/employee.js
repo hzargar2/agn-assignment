@@ -42,8 +42,8 @@ export const construct_employee_html = (employee, dx, dy) => {
                 <foreignObject x="-120" y="0" width="${dx}" height="${dy}">
                     <div class="w-full h-full flex flex-col p-4 gap-y-2 rounded-lg shadow hover:cursor-pointer ${background_color}">
                         <div class="flex flex-col gap-y-1 mt-0 m-auto">
-                            <span class="flex font-medium mx-auto">${employee.data["Name"]}</span>
-                            <span class="flex text-center mx-auto text-gray-600">${employee.data["Job Title"]}</span>
+                            <span class="flex font-medium mx-auto text-lg">${employee.data["Name"]}</span>
+                            <span class="flex text-center mx-auto text-gray-600 text-lg">${employee.data["Job Title"]}</span>
                         </div>
                         
                         <div class="flex flex-col gap-1 mb-0 m-auto text-sm">
