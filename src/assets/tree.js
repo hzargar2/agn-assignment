@@ -18,8 +18,8 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         (raw_json);
 
     // this is the size of each individual node
-    const dx = 200;
-    const dy = 300;
+    const dx = 240;
+    const dy = 340;
 
     // Define the tree layout and the shape for links.
     const tree = d3.tree().nodeSize([dx, dy])
@@ -33,7 +33,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         .attr("width", dx)
         .attr("height", dy)
         .attr("viewBox", [0, 0, dx + marginLeft + marginRight, dy + marginTop + marginBottom])
-        .attr("style", "min-width: 100%; font: 10px sans-serif;");
+        .attr("style", "min-width: 100%;");
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -120,7 +120,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
             .duration(duration)
             .attr("width", d3.max([width, dx]))
             .attr("height",  d3.max([height, dy]))
-            .attr("viewBox", [-d3.max([width, dx])/2-marginLeft-marginRight, -marginTop, d3.max([width, dx]), d3.max([height, dy])])
+            .attr("viewBox", [-d3.max([width, dx])/2, -marginTop, d3.max([width, dx]), d3.max([height, dy])])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
@@ -129,7 +129,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
 
         // Enter any new nodes at the parent's previous position.
         const nodeEnter = node.enter().append("g")
-            .attr("transform", `translate(${source.x0},${source.y0})`)
+            .attr("transform", d => `translate(${source.x0},${source.y0})`)
             .attr("fill-opacity", 0)
             .attr("stroke-opacity", 0)
             .on("click", (event, d) => {
@@ -139,12 +139,65 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
             .call(drag);
 
         nodeEnter.html((d) => {
+
+            let background_color;
+            let background_text;
+
+            if (d.data["Department"].toLowerCase().includes("operations")){
+                background_color = "bg-lime-50 hover:bg-lime-100";
+                background_text = "bg-lime-200";
+            }else if (d.data["Department"].toLowerCase().includes("sales")) {
+                background_color = "bg-emerald-50 hover:bg-emerald-100";
+                background_text = "bg-emerald-200";
+            }else if (d.data["Department"].toLowerCase().includes("data analytics")) {
+                background_color = "bg-teal-50 hover:bg-teal-100";
+                background_text = "bg-teal-200";
+            }
+            else if (d.data["Department"].toLowerCase().includes("customer support")) {
+                background_color = "bg-cyan-50 hover:bg-cyan-100";
+                background_text = "bg-cyan-200";
+            }
+            else if (d.data["Department"].toLowerCase().includes("system")) {
+                background_color = "bg-indigo-50 hover:bg-indigo-100";
+                background_text = "bg-indigo-200";
+            }
+            else if (d.data["Department"].toLowerCase().includes("project")) {
+                background_color = "bg-purple-50 hover:bg-purple-100";
+                background_text = "bg-purple-200";
+            }
+            else if (d.data["Department"].toLowerCase().includes("human resources")) {
+                background_color = "bg-rose-50 hover:bg-rose-100";
+                background_text = "bg-rose-200";
+            }
+            else if (d.data["Department"].toLowerCase().includes("software")) {
+                background_color = "bg-amber-50 hover:bg-amber-100";
+                background_text = "bg-amber-200";
+            }
+            else{
+                background_color = "bg-stone-50 hover:bg-stone-100";
+                background_text = "bg-stone-200";
+            }
+
             return `
                 <foreignObject x="-120" y="0" width="${dx}" height="${dy}">
-                    <div class="border-2 w-[${dx}px] h-[${dy}px] border-red-500 flex flex-col p-4 gap-y-2 rounded-lg shadow hover:cursor-pointer bg-white">
+                    <div class="w-full h-full flex flex-col p-4 gap-y-2 rounded-lg shadow hover:cursor-pointer ${background_color}">
                         <div class="flex flex-col gap-y-1 mt-0 m-auto">
                             <span class="flex font-medium mx-auto">${d.data["Name"]} ${d.data["Employee Id"]}</span>
-                            <span class="flex text-center mx-auto text-gray-600 {{background_text}}">${d.data["Job Title"]}</span>
+                            <span class="flex text-center mx-auto text-gray-600 ${background_text}">${d.data["Job Title"]}</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-1 mb-0 m-auto text-sm">
+                            <!--                Calculate numeric values for styling inline-->
+                            <span class="flex text-center px-2 py-0.5 rounded-2xl m-auto border-2 border-gray-800 border-opacity-60 ${background_text}">${d.data["Department"]}</span>
+                            <span class="flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}">Level ${d.data["level"]}</span>
+                            <span class="flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}">Management cost: ${d.data["management_cost"] > 1000000 ? (Math.round((d.data["management_cost"] + Number.EPSILON) / 1000000 * 100) / 100) + "M" : (Math.round((d.data["management_cost"] / 1000 + Number.EPSILON) * 100) / 100) + "K"}</span>
+                            <span class="flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}">IC cost: ${d.data["ic_cost"] > 1000000 ? (Math.round((d.data["ic_cost"] + Number.EPSILON) / 1000000 * 100) / 100) + "M" : (Math.round((d.data["ic_cost"] / 1000 + Number.EPSILON) * 100) / 100) + "K"}</span>
+                            <span class="flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}">Total cost: ${d.data["total_cost"] > 1000000 ? (Math.round((d.data["total_cost"] + Number.EPSILON) / 1000000 * 100) / 100) + "M" : (Math.round((d.data["total_cost"] / 1000 + Number.EPSILON) * 100) / 100) + "K"}</span>
+                            <span class="flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}">Management cost ratio: ${Math.round((d.data["management_cost_ratio"] + Number.EPSILON) * 100) / 100}</span>
+                            <div class="flex flex-row px-2 py-0.5 gap-x-1 rounded-2xl m-auto ${background_text}">
+                                <svg class="h-3 w-3 m-auto" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M3.37892 10.2236L8 16L12.6211 10.2236C13.5137 9.10788 14 7.72154 14 6.29266V6C14 2.68629 11.3137 0 8 0C4.68629 0 2 2.68629 2 6V6.29266C2 7.72154 2.4863 9.10788 3.37892 10.2236ZM8 8C9.10457 8 10 7.10457 10 6C10 4.89543 9.10457 4 8 4C6.89543 4 6 4.89543 6 6C6 7.10457 6.89543 8 8 8Z" fill="#000000"></path> </g></svg>
+                                <span class="flex text-center">${d.data["Location"]}</span>
+                            </div>
                         </div>
                     </div>
                 </foreignObject>`;
