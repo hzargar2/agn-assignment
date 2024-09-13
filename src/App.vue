@@ -85,7 +85,7 @@ the html into the DOM but not here. DOM updates after onMounted is run so if jav
 it won;t work since DOM hasn't updated yet to include the div that contains the child element but if run the javascript
 in a separate file where element is already rendered (e no conditional rendering then can javascript can inject html
 and update the DOM successfully  -->
-                <EmployeeTree :employees_json="employees"/>
+                <EmployeeTree :employees_json="employees" graph_dom_id="tree_graph"/>
             </div>
         </div>
     </main>

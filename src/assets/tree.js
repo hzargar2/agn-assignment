@@ -33,6 +33,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         .append("svg")
         .attr("width", dx)
         .attr("height", dy)
+        .classed("mt-20", true)
         .attr("viewBox", [0, 0, dx + marginLeft + marginRight, dy + marginTop + marginBottom])
         .attr("style", "min-width: 100%;");
 
@@ -110,10 +111,11 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         });
 
         // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
-        let height = bottom.y - top.y + marginTop + marginBottom + dy;
+        let height = bottom.y - top.y + dy;
         // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
-        let width = right.x - left.x + marginLeft + marginRight + dx;
+        let width = right.x - left.x + dx;
 
+        console.log(bottom.y - top.y + dy)
         console.log(right.x, left.x, right.x - left.x)
         console.log(width)
 
@@ -121,7 +123,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
             .duration(duration)
             .attr("width", d3.max([width, dx]))
             .attr("height",  d3.max([height, dy]))
-            .attr("viewBox", [-d3.max([width, dx])/2, -marginTop, d3.max([width, dx]), d3.max([height, dy])])
+            .attr("viewBox", [-d3.max([width, dx])/2, 0, d3.max([width, dx]), d3.max([height, dy])])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
@@ -142,6 +144,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         // construct employee html using a foreignObject element and append it to the node since can;t append
         // div directly as a child of SVG element
         nodeEnter.html((node) => {
+            // console.log(node)
             return construct_employee_html(node.data, dx, dy);
         });
 

@@ -7,15 +7,19 @@ let props = defineProps({
     employees_json: {
         type: Object,
         required: true
+    },
+    graph_dom_id: {
+        type: String,
+        required: true
     }
 })
 
 onMounted(() => {
-    create_graph_at_element_id("#tree-graph", props.employees_json);
+    create_graph_at_element_id("#" + props.graph_dom_id, props.employees_json);
 })
 
 </script>
 
 <template>
-  <div id="tree-graph"></div>
+  <div v-bind:id="props.graph_dom_id"></div>
 </template>
