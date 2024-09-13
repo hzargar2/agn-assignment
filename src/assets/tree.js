@@ -9,6 +9,8 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
     const marginTop = 40;
     const radius = 5.5;
 
+    let height, width;
+
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
     // “bottom”, in the data domain. The width of a column is based on the tree’s height.
@@ -18,8 +20,8 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         (raw_json);
 
     // this is the size of each individual node
-    const dx = 240;
-    const dy = 320;
+    const dx = 200;
+    const dy = 300;
 
     // Define the tree layout and the shape for links.
     const tree = d3.tree().nodeSize([dx, dy]);
@@ -53,6 +55,33 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         }
     }
 
+    // function diagonal(d, i) {
+    //     return     "M" + (d.source.x) + "," + (d.source.y)
+    //         + "V" + (((d.source.y + dy) + (d.target.y + dy))/7)
+    //         + "H" + (d.target.x)
+    //         + "V" + (d.target.y);
+    // };
+
+
+    function dragstarted(event, d) {
+        d3.select(this).raise().attr("stroke", "black");
+    }
+
+    function dragged(event, d) {
+        d.x = event.x;
+        d.y = event.y;
+        d3.select(this).attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    }
+
+    function dragended(event, d) {
+        d3.select(this).attr("stroke", null);
+    }
+
+    let drag = d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+
     // run every time we want to update tree state
     function update(event, source) {
 
@@ -76,15 +105,18 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         });
 
         // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
-        const height = bottom.y - top.y + marginTop + marginBottom + 320;
+        let height = bottom.y - top.y + marginTop + marginBottom + dy;
         // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
-        const width = right.x - left.x + marginLeft + marginRight + 240;
+        let width = right.x - left.x + marginLeft + marginRight + dx;
+
+        console.log(right.x, left.x, right.x - left.x)
+        console.log(width)
 
         const transition = svg.transition()
             .duration(duration)
             .attr("width", d3.max([width, dx]))
             .attr("height",  d3.max([height, dy]))
-            .attr("viewBox", [-width/2, top.x - marginTop, width, height])
+            .attr("viewBox", [-d3.max([width, dx])/2, top.y - marginTop, d3.max([width, dx]), d3.max([height, dy])])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
@@ -93,18 +125,19 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
 
         // Enter any new nodes at the parent's previous position.
         const nodeEnter = node.enter().append("g")
-            .attr("transform", d => `translate(${source.x0},${source.y0})`)
+            .attr("transform", `translate(${source.x0},${source.y0})`)
             .attr("fill-opacity", 0)
             .attr("stroke-opacity", 0)
             .on("click", (event, d) => {
                 d.children = d.children ? null : d._children;
                 update(event, d);
-            });
+            })
+            .call(drag);
 
         nodeEnter.html((d) => {
             return `
-                <foreignObject x="-120" y="0" width="240" height="320">
-                    <div :class="flex flex-col p-4 gap-y-2 bg-white border border-gray-200 rounded-lg shadow hover:cursor-pointer bg-white">
+                <foreignObject x="-120" y="0" width="${dx}" height="${dy}">
+                    <div class="border-2 w-[${dx}px] h-[${dy}px] border-red-500 flex flex-col p-4 gap-y-2 rounded-lg shadow hover:cursor-pointer bg-white">
                         <div class="flex flex-col gap-y-1 mt-0 m-auto">
                             <span class="flex font-medium mx-auto">${d.data["Name"]} ${d.data["Employee Id"]}</span>
                             <span class="flex text-center mx-auto text-gray-600 {{background_text}}">${d.data["Job Title"]}</span>
