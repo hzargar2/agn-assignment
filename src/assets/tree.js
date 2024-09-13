@@ -9,8 +9,6 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
     const marginTop = 40;
     const radius = 5.5;
 
-    let height, width;
-
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
     // “bottom”, in the data domain. The width of a column is based on the tree’s height.
@@ -24,7 +22,8 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
     const dy = 300;
 
     // Define the tree layout and the shape for links.
-    const tree = d3.tree().nodeSize([dx, dy]);
+    const tree = d3.tree().nodeSize([dx, dy])
+        .separation(function(a, b) { return (a.parent == b.parent ? 1.1 : 1.5); });
     // create vertical paths from parents to children
     const diagonal = d3.linkVertical().y(d => d.y).x(d => d.x);
 
@@ -92,6 +91,11 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
         // Compute the new tree layout.
         tree(root);
 
+        // Normalize for fixed-depth.
+        nodes.forEach(function(d) {
+            d.y = d.depth * 400;
+        });
+
         // find the top most node, the bottom most node, the most right node, and the most left node
         let top = root;
         let bottom = root;
@@ -116,7 +120,7 @@ export const create_graph_at_element_id = (root_id, raw_json) => {
             .duration(duration)
             .attr("width", d3.max([width, dx]))
             .attr("height",  d3.max([height, dy]))
-            .attr("viewBox", [-d3.max([width, dx])/2, top.y - marginTop, d3.max([width, dx]), d3.max([height, dy])])
+            .attr("viewBox", [-d3.max([width, dx])/2-marginLeft-marginRight, -marginTop, d3.max([width, dx]), d3.max([height, dy])])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
