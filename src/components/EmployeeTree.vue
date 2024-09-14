@@ -36,22 +36,21 @@ onMounted(() => {
         (props.employees_json);
 
     // this is the size of each individual node
-    const dx = 240 + shadow_px_room_for_each_node;
-    const dy = 320 + shadow_px_room_for_each_node;
+    const dx = 250 + shadow_px_room_for_each_node;
+    const dy = 350 + shadow_px_room_for_each_node;
 
     // Define the tree layout and the shape for links.
     const tree = d3.tree().nodeSize([dx, dy])
         .separation(function(a, b) { return (a.parent == b.parent ? horizontal_separation_factor_for_same_parent : horizontal_separation_factor_for_different_parent); });
     // create vertical paths from parents to children
-    const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
+    // const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
 
     // svg takes height and width of parent when not specified. See element for the tree id. Also setthe view box to the
     // entire screen and shift it on the x-axis by negative width/2 so the root node ends up in the center.
     // Create the SVG container, a layer for the links and a layer for the nodes. Set initialize size to the size of 1 node
     const svg = d3.select("#" + props.graph_dom_id)
         .append("svg")
-        .attr("viewBox", [-window.screen.width/2, -marginTop, window.screen.width, window.screen.height])
-        .attr("pointer-events", "all");
+        .attr("viewBox", [-window.screen.width/2, -marginTop, window.screen.width, window.screen.height]);
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -60,8 +59,7 @@ onMounted(() => {
         .attr("stroke-width", 1.5);
 
     const gNode = svg.append("g")
-        .attr("cursor", "pointer")
-        .attr("pointer-events", "all");
+        .attr("cursor", "pointer");
 
     // apply transformations on zoom and drag, for some reason also works with drag
     const zoomBehaviours = d3.zoom()
@@ -83,12 +81,41 @@ onMounted(() => {
         }
     }
 
-    // function diagonal(node, i) {
-    //     return     "M" + (node.source.x) + "," + (node.source.y)
-    //         + "V" + (((node.source.y + dy) + (node.target.y + dy))/7)
-    //         + "H" + (node.target.x)
-    //         + "V" + (node.target.y);
-    // };
+    function diagonal(node, i) {
+        return     "M" + (node.source.x) + "," + (node.source.y)
+            + "V" + (((node.source.y + dy) + (node.target.y + dy))/7)
+            + "H" + (node.target.x)
+            + "V" + (node.target.y);
+    };
+
+
+//     function dragStarted(event) {
+//         console.log(event)
+//
+//         event.subject.fx = event.subject.x;
+//         event.subject.fy = event.subject.y;
+//
+//
+//     }
+//
+//     // Update the subject (dragged node) position during drag.
+//     function dragged(event, node) {
+//
+//         console.log(node);
+//         node.x = event.x;
+//         node.y = event.y;
+//         console.log(this);
+//         let card = d3.select(this).attr("transform", "translate(" + event.x + "," + event.y + ")");
+//         card.selectAll("path").attr("transform", "translate(" + event.x + "," + event.y + ")");
+//     }
+//
+//     // Restore the target alpha so the simulation cools after dragging ends.
+//     // Unfix the subject position now that it’s no longer being dragged.
+//     function dragended(event) {
+//         // if (!event.active) simulation.alphaTarget(0);
+//         event.subject.fx = null;
+//         event.subject.fy = null;
+//     }
 
 
     // run every time we want to update tree state
@@ -131,7 +158,12 @@ onMounted(() => {
 
                 update(event, node);
 
-            });
+            })
+            // .call(d3.drag()
+            //     .on("start", dragStarted)
+            //     .on("drag", dragged)
+            //     .on("end", dragended)
+            // );
 
         // create an Employee component and add the rendered html to the node
         nodeEnter.html((node) => {

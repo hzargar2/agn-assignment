@@ -53,7 +53,7 @@ onBeforeMount(() => {
 
 <template>
 
-    <div :class="`w-60 h-80 m-auto justify-center flex flex-col p-4 gap-y-2 rounded-lg shadow-md group-hover:cursor-pointer ${background_color}`">
+    <div :class="`w-[250px] h-[350px] m-auto justify-center flex flex-col p-4 gap-y-2 rounded-lg shadow-md group-hover:cursor-pointer ${background_color}`">
         <div class="flex flex-col gap-y-1 mt-0 m-auto">
             <span class="flex font-medium mx-auto text-lg">{{props.employee.data["Name"]}}</span>
             <span class="flex text-center mx-auto text-gray-600 text-lg">{{props.employee.data["Job Title"]}}</span>
@@ -73,9 +73,9 @@ onBeforeMount(() => {
                 <span class="flex text-center">{{props.employee.data["Location"]}}</span>
             </span>
         </div>
-<!--        <div v-if="children.length > 0" class="bg-slate-700 rounded-3xl text-white w-fit px-2 py-0.5 m-auto">-->
-<!--            <span class="text-center">{{children.length}}/{{props.employee.data["descendant_count"]}}</span>-->
-<!--        </div>-->
+        <div v-if="props.employee._children?.length > 0" class="bg-slate-700 rounded-3xl text-white w-fit px-2 py-0.5 m-auto">
+            <span class="text-center">{{props.employee._children.length}}/{{props.employee.data["descendant_count"]}}</span>
+        </div>
     </div>
 
 
