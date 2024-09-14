@@ -76,7 +76,6 @@ onBeforeMount(async () => {
 
         <!--        Add root element in chart-->
         <div id="zoomtext" class="flex min-h-screen w-full h-full" v-else>
-            <div class="flex mx-auto pb-72">
 <!--                Need to use a separate component to render D3 tree since we need parent div to render before chart
 javascript can inject html into DOM, div in component is not conditionally rendered so javascript function can inject
 the html into the DOM but not here. DOM updates after onMounted is run so if javascript is executed in this component
@@ -84,7 +83,6 @@ it won;t work since DOM hasn't updated yet to include the div that contains the 
 in a separate file where element is already rendered (e no conditional rendering then can javascript can inject html
 and update the DOM successfully  -->
                 <EmployeeTree :employees_json="employees" graph_dom_id="tree_graph"/>
-            </div>
         </div>
     </main>
 </template>
