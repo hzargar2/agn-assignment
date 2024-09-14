@@ -1,6 +1,5 @@
 <script setup>
 import {onBeforeMount, onMounted, ref} from "vue";
-import * as d3 from "d3";
 
 let props = defineProps({
     employee: {

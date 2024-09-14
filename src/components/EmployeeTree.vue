@@ -47,7 +47,7 @@ onMounted(() => {
     const tree = d3.tree().nodeSize([dx, dy])
         .separation(function(a, b) { return (a.parent == b.parent ? horizontal_separation_factor_for_same_parent : horizontal_separation_factor_for_different_parent); });
     // create vertical paths from parents to children
-    const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
+    // const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
 
     // Create the SVG container, a layer for the links and a layer for the nodes. Set initialize size to the size of 1 node
     const svg = d3.select("#" + props.graph_dom_id)
@@ -77,12 +77,12 @@ onMounted(() => {
         }
     }
 
-    // function diagonal(node, i) {
-    //     return     "M" + (node.source.x) + "," + (node.source.y)
-    //         + "V" + (((node.source.y + dy) + (node.target.y + dy))/7)
-    //         + "H" + (node.target.x)
-    //         + "V" + (node.target.y);
-    // };
+    function diagonal(node, i) {
+        return     "M" + (node.source.x) + "," + (node.source.y)
+            + "V" + (((node.source.y + dy) + (node.target.y + dy))/7)
+            + "H" + (node.target.x)
+            + "V" + (node.target.y);
+    };
 
 
     function dragstarted(event, node) {
@@ -134,7 +134,7 @@ onMounted(() => {
         // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
         let height = bottom.y - top.y + dy;
         // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
-        let width = right.x - left.x + dx*2;
+        let width = right.x - left.x + dx;
 
         console.log(bottom.y - top.y + dy)
         console.log(right.x, left.x, right.x - left.x)
@@ -144,7 +144,7 @@ onMounted(() => {
             .duration(duration)
             .attr("width", d3.max([width, dx]))
             .attr("height",  d3.max([height, dy]))
-            .attr("viewBox", [-d3.max([width, dx])/2, 0, d3.max([width, dx]), d3.max([height, dy])])
+            .attr("viewBox", [-d3.max([width, dx])/2, 0, d3.max([width+marginLeft+marginRight, dx]), d3.max([height+marginTop+marginBottom, dy])])
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
 
         // Update the nodes…
@@ -156,22 +156,32 @@ onMounted(() => {
             .attr("transform", node => `translate(${source.x0},${source.y0})`)
             .classed("group", true) // triggers on hover styling in Employee component, useful since want to change styling even if the node is hovered on since the shadow is part of the node, can't put shadow outside node
             .on("click", (event, node) => {
+
                 node.children = node.children ? null : node._children;
+
+                // if the nodes children are null, ie we have clicked to close the card then we need to also collapse
+                // of the descendant children of this node recursively so that when we reopen it only opens 1 level
+                // is opened and not all the previous levels that existed prior to the close.
+                if (!node.children){
+                    node._children.forEach((node) => collapse(node));
+                }
+
                 update(event, node);
+
             })
             .call(drag);
 
-        // construct employee html using a foreignObject element and append it to the node since can;t append
-        // div directly as a child of SVG element
+        // create an Employee component and add the rendered html to the node
         nodeEnter.html((node) => {
-            console.log(node)
+            // console.log(node)
             let elm = document.createElement('foreignObject');
-            elm.setAttribute("x", -120);
+            elm.setAttribute("x", -dx/2);
             elm.setAttribute("y", 0);
             elm.setAttribute("width", dx);
             elm.setAttribute("height", dy);
 
             createApp(Employee, {employee: node}).mount(elm);
+            // console.log(elm.outerHTML)
             return elm.outerHTML;
         });
 
@@ -180,12 +190,12 @@ onMounted(() => {
         //     .attr("r", 5.5)
         //     .attr("fill", node => node._children ? "#555" : "#999");
 
-        // sets the text beside the nodes
-        nodeEnter.append("text")
-            .attr("dy", "0.31em")
-            .attr("x", node => node._children ? -8 : 8)
-            .attr("text-anchor", node => node._children ? "end" : "start")
-            .text(node => node.data["Employee Id"]);
+        // // sets the text beside the nodes
+        // nodeEnter.append("text")
+        //     .attr("dy", "0.31em")
+        //     .attr("x", node => node._children ? -8 : 8)
+        //     .attr("text-anchor", node => node._children ? "end" : "start")
+        //     .text(node => node.data["Employee Id"]);
 
         // Transition nodes to their new position.
         const nodeUpdate = node.merge(nodeEnter).transition(transition)
@@ -237,7 +247,7 @@ onMounted(() => {
     });
 
     collapse(root)
-    update(null, root);
+    update(null, root, root.depth);
 })
 
 </script>
