@@ -68,7 +68,7 @@ onBeforeMount(() => {
             <span v-if="props.employee.data['descendant_count'] > 0" :class="`flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}`">Total cost: ${{props.employee.data["total_cost"] > 1000000000 ? (Math.round((props.employee.data["total_cost"] + Number.EPSILON) / 1000000000 * 100) / 100) + "B" :props.employee.data["total_cost"] > 1000000 ? (Math.round((props.employee.data["total_cost"] + Number.EPSILON) / 1000000 * 100) / 100) + "M" : (Math.round((props.employee.data["total_cost"] / 1000 + Number.EPSILON) * 100) / 100) + "K"}}</span>
             <span v-if="props.employee.data['descendant_count'] > 0" :class="`flex text-center px-2 py-0.5 rounded-2xl m-auto ${background_text}`">Management cost ratio: {{Math.round((props.employee.data["management_cost_ratio"] + Number.EPSILON) * 100) / 100}}</span>
             <span :class="`flex flex-row px-2 py-0.5 gap-x-1 rounded-2xl m-auto ${background_text}`">
-<!--                Need to store svg as file and import using html img attribute, rending an svg inside an svg in the d3 chart doesn't work since it is xml, d3.xml() might also work, use this method instead-->
+<!--                Need to store svg as file and import using html img attribute, rending an svg inside an svg in the d3 chart doesn't work since it is xml, d3.xml() might also work, use this method here instead-->
                 <img class="h-3 w-3 m-auto" src="@/assets/location_pin.svg" alt="location pin"/>
                 <span class="flex text-center">{{props.employee.data["Location"]}}</span>
             </span>

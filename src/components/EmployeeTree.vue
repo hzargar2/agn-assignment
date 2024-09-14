@@ -24,7 +24,7 @@ onMounted(() => {
     const marginTop = 40;
     const horizontal_separation_factor_for_same_parent = 1.1
     const horizontal_separation_factor_for_different_parent = 1.5
-    const vertical_separation_of_levels_in_px = 400
+    const vertical_separation_of_levels_in_px = 430
     const shadow_px_room_for_each_node = 10;
 
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
@@ -42,8 +42,6 @@ onMounted(() => {
     // Define the tree layout and the shape for links.
     const tree = d3.tree().nodeSize([dx, dy])
         .separation(function(a, b) { return (a.parent == b.parent ? horizontal_separation_factor_for_same_parent : horizontal_separation_factor_for_different_parent); });
-    // create vertical paths from parents to children
-    // const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
 
     // svg takes height and width of parent when not specified. See element for the tree id. Also setthe view box to the
     // entire screen and shift it on the x-axis by negative width/2 so the root node ends up in the center.
@@ -70,7 +68,8 @@ onMounted(() => {
     });
 
     // add zoom and drag behavior to element
-    svg.call(zoomBehaviours);
+    svg.call(zoomBehaviours)
+        .call(zoomBehaviours.transform, d3.zoomIdentity.scale(0.5)); // set initial zoom
 
     // Collapse the node and all it's children
     function collapse(node) {
@@ -81,13 +80,17 @@ onMounted(() => {
         }
     }
 
-    function diagonal(node, i) {
-        return     "M" + (node.source.x) + "," + (node.source.y)
-            + "V" + (((node.source.y + dy) + (node.target.y + dy))/7)
-            + "H" + (node.target.x)
-            + "V" + (node.target.y);
-    };
 
+    // create vertical paths from parents to children, determines the shape
+    function diagonal(node, i) {
+        console.log(node)
+        return "M" + node.source.x + "," + node.source.y
+            + "V" + (node.target.y - vertical_separation_of_levels_in_px/15) // The constant is an arbitrary value that determines
+            // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
+            // of the nodes
+            + "H" + node.target.x
+            + "V" + node.target.y;
+    };
 
 //     function dragStarted(event) {
 //         console.log(event)
@@ -196,20 +199,17 @@ onMounted(() => {
         // Enter any new links at the parent's previous position.
         const linkEnter = link.enter().append("path")
             .attr("d", node => {
-            // d3.linkVertical().y((d) => (d.y === d.source.y0 ? d.y + 100 : d.y)).x((d) => d.x)(node);
-                const o = {x: source.x0, y: source.y0};
-                return diagonal({source: o, target: o});
+                return diagonal(node);
             });
 
         // Transition links to their new position.
         link.merge(linkEnter).transition(transition)
-            .attr("d", diagonal);
+            .attr("d", node => diagonal(node));
 
         // Transition exiting nodes to the parent's new position.
         link.exit().transition(transition).remove()
             .attr("d", node => {
-                const o = {x: source.x, y: source.y};
-                return diagonal({source: o, target: o});
+                return diagonal(node);
             });
 
         // Stash the old positions for transition.
