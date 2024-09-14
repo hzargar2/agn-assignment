@@ -43,8 +43,6 @@ onBeforeMount(async () => {
     // set flag to update DOM
     data_ready.value = true;
 
-    // create Zoom button event listeners on mount
-    zoom(1, 0.2, "zoomIn", "zoomOut", "zoomtext");
 })
 
 </script>
@@ -52,11 +50,6 @@ onBeforeMount(async () => {
 
 <template>
     <main>
-        <div class="fixed z-20 top-0 right-0 space-x-4 py-6 px-12">
-            <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomOut">-</button>
-            <button class="rounded-full bg-gray-300 hover:bg-gray-400 h-12 w-12 text-3xl text-gray-600 text-center" id="zoomIn">+</button>
-        </div>
-
         <div class="flex w-screen h-screen" v-if="failed_to_fetch_data && data_ready">
             <span class="flex gap-y-4 flex-col w-fit h-fit m-auto text-center p-4 bg-rose-500 text-slate-100 rounded-xl">
                 <span class="text-4xl">Failed to load CSV file</span>
@@ -75,21 +68,14 @@ onBeforeMount(async () => {
         </div>
 
         <!--        Add root element in chart-->
-        <div id="zoomtext" class="flex min-h-screen w-full h-full" v-else>
+        <div class="flex min-h-screen w-full h-full" v-else>
 <!--                Need to use a separate component to render D3 tree since we need parent div to render before chart
 javascript can inject html into DOM, div in component is not conditionally rendered so javascript function can inject
 the html into the DOM but not here. DOM updates after onMounted is run so if javascript is executed in this component
 it won;t work since DOM hasn't updated yet to include the div that contains the child element but if run the javascript
 in a separate file where element is already rendered (e no conditional rendering then can javascript can inject html
 and update the DOM successfully  -->
-                <EmployeeTree :employees_json="employees" graph_dom_id="tree_graph"/>
+              <EmployeeTree :employees_json="employees" graph_dom_id="tree_graph"/>
         </div>
     </main>
 </template>
-
-<style>
-    #zoomtext {
-        transform: scale(1);
-        transition: transform 0.2s ease-in-out;
-    }
-</style>

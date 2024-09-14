@@ -21,16 +21,11 @@ let props = defineProps({
 onMounted(() => {
 
     // Specify the charts’ dimensions. The height is variable, depending on the layout.
-    const marginLeft = 10;
-    const marginBottom = 10;
-    const marginRight = 10;
     const marginTop = 40;
-    const radius = 5.5;
     const horizontal_separation_factor_for_same_parent = 1.1
     const horizontal_separation_factor_for_different_parent = 1.5
     const vertical_separation_of_levels_in_px = 400
     const shadow_px_room_for_each_node = 10;
-    let previous_width = 0;
 
     // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
     // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
@@ -50,24 +45,13 @@ onMounted(() => {
     // create vertical paths from parents to children
     const diagonal = d3.linkVertical().y(node => node.y).x(node => node.x);
 
+    // svg takes height and width of parent when not specified. See element for the tree id. Also setthe view box to the
+    // entire screen and shift it on the x-axis by negative width/2 so the root node ends up in the center.
     // Create the SVG container, a layer for the links and a layer for the nodes. Set initialize size to the size of 1 node
     const svg = d3.select("#" + props.graph_dom_id)
         .append("svg")
         .attr("viewBox", [-window.screen.width/2, -marginTop, window.screen.width, window.screen.height])
         .attr("pointer-events", "all");
-        // .attr("transform","scale(.5,.5)");
-
-    // let zoom = d3.zoom().on("zoom", function(event){
-    //     console.log("here");
-    //     svg.selectAll("g").attr("transform", "scale(" + event.transform.k + ")");
-    //     svg.selectAll("path").attr("transform", "scale(" + event.transform.k + ")");
-    // });
-    //
-    // // console.log("here");
-    // // svg.selectAll("g").attr("transform", "scale(" + event.transform.k + ")");
-    // // svg.selectAll("path").attr("transform", "scale(" + event.transform.k + ")");
-    //
-    // svg.call(zoom);
 
     const gLink = svg.append("g")
         .attr("fill", "none")
@@ -79,16 +63,16 @@ onMounted(() => {
         .attr("cursor", "pointer")
         .attr("pointer-events", "all");
 
+    // apply transformations on zoom and drag, for some reason also works with drag
     const zoomBehaviours = d3.zoom()
-        .scaleExtent([0.05, 3])
+        .scaleExtent([0.2, 1.5])
         .on('zoom', function (event){
             gNode.attr('transform', event.transform);
             gLink.attr('transform', event.transform);
     });
 
+    // add zoom and drag behavior to element
     svg.call(zoomBehaviours);
-
-    setTimeout(() => zoomBehaviours.translateTo(svg, 0, 0), 100);
 
     // Collapse the node and all it's children
     function collapse(node) {
@@ -107,25 +91,6 @@ onMounted(() => {
     // };
 
 
-    // function dragstarted(event, node) {
-    //     d3.select(this).raise().attr("stroke", "black");
-    // }
-    //
-    // function dragged(event, node) {
-    //     node.x = event.x;
-    //     node.y = event.y;
-    //     d3.select(this).attr("cx", (node) => node.x).attr("cy", (node) => node.y);
-    // }
-    //
-    // function dragended(event, node) {
-    //     d3.select(this).attr("stroke", null);
-    // }
-    //
-    // let drag = d3.drag()
-    //     .on("start", dragstarted)
-    //     .on("drag", dragged)
-    //     .on("end", dragended);
-
     // run every time we want to update tree state
     function update(event, source) {
 
@@ -141,54 +106,9 @@ onMounted(() => {
             node.y = node.depth * vertical_separation_of_levels_in_px;
         });
 
-        // compute the new height
-        var levelWidth = [1];
-        var childCount = function(level, n) {
-
-            if(n.children && n.children.length > 0) {
-                if(levelWidth.length <= level + 1) levelWidth.push(0);
-
-                levelWidth[level+1] += n.children.length;
-                n.children.forEach(function(d) {
-                    childCount(level + 1, d);
-                });
-            }
-        };
-        childCount(0, root);
-
-        // find the top most node, the bottom most node, the most right node, and the most left node
-        let top = root;
-        let bottom = root;
-        let left = root;
-        let right = root;
-        root.eachBefore(node => {
-            if (node.x < left.x) left = node;
-            if (node.x > right.x) right = node;
-            if (node.y < top.y) top = node;
-            if (node.y > bottom.y) bottom = node;
-        });
-
-        // height is the difference between top most and bottom most nodes plus their added margins, essentially giving the height of our tree
-        let height = bottom.y - top.y + dy;
-        // height is the horizontal difference between right most and left most nodes plus their added margins, essentially giving the width of our tree
-        let width = right.x - left.x + dx;
-
-        console.log("top: ", top.y, "bottom: ",bottom.y, "height: ", bottom.y - top.y)
-        console.log("right: ",right.x, "left: ", left.x, "width: ", right.x - left.x)
-        console.log("previous: ", previous_width, "width: ", width)
-
-        console.log(svg.attr("viewBox"))
-
         const transition = svg.transition()
             .duration(duration)
             .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
-
-
-        previous_width = width;
-
-
-
-
 
         // Update the nodes…
         const node = gNode.selectAll("g")
@@ -211,8 +131,7 @@ onMounted(() => {
 
                 update(event, node);
 
-            })
-            // .call(drag);
+            });
 
         // create an Employee component and add the rendered html to the node
         nodeEnter.html((node) => {
@@ -227,18 +146,6 @@ onMounted(() => {
             // console.log(elm.outerHTML)
             return elm.outerHTML;
         });
-
-        // // sets the color of the node circle
-        // nodeEnter.append("circle")
-        //     .attr("r", 5.5)
-        //     .attr("fill", node => node._children ? "#555" : "#999");
-
-        // // sets the text beside the nodes
-        // nodeEnter.append("text")
-        //     .attr("dy", "0.31em")
-        //     .attr("x", node => node._children ? -8 : 8)
-        //     .attr("text-anchor", node => node._children ? "end" : "start")
-        //     .text(node => node.data["Employee Id"]);
 
         // Transition nodes to their new position.
         const nodeUpdate = node.merge(nodeEnter).transition(transition)
@@ -291,7 +198,7 @@ onMounted(() => {
     });
 
     collapse(root)
-    update(null, root, root.depth);
+    update(null, root);
 })
 
 </script>
