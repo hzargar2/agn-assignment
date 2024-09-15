@@ -14,6 +14,8 @@ let props = defineProps({
 
 const propsAsRefs = toRefs(props);
 
+const name_initials = propsAsRefs.employee.value.data["Name"].split(" ").map((val) => val[0]).join("");
+
 let background_color = ref('');
 let background_text = ref('');
 
@@ -58,7 +60,7 @@ onBeforeMount(() => {
 
 <template>
 
-    <div :class="`w-[250px] h-[350px] m-auto justify-center flex flex-col p-4 gap-y-2 rounded-lg shadow-md group-hover:cursor-pointer ${background_color}`">
+    <div :class="`relative w-[250px] h-[350px] m-auto justify-center flex flex-col p-4 gap-y-2 rounded-lg shadow-md group-hover:cursor-pointer ${background_color}`">
         <div class="flex flex-col gap-y-1 mt-0 m-auto">
             <span class="flex font-medium mx-auto text-lg">{{propsAsRefs.employee.value.data["Name"]}}</span>
             <span class="flex text-center mx-auto text-gray-600 text-lg">{{propsAsRefs.employee.value.data["Job Title"]}}</span>
@@ -80,7 +82,6 @@ onBeforeMount(() => {
         </div>
         <div v-if="propsAsRefs.employee.value._children?.length > 0" class="bg-slate-700 rounded-3xl text-white w-fit px-2 py-0.5 m-auto">
             <span class="text-center">{{propsAsRefs.employee.value._children.length}}/{{propsAsRefs.employee.value.data["descendant_count"]}}</span>
-<!--            <img v-if="propsAsRefs.expanded.value" class="h-3 w-3 m-auto" src="@/assets/location_pin.svg" alt="location pin"/>-->
         </div>
     </div>
 
