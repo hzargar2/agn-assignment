@@ -82,7 +82,6 @@ onMounted(() => {
 
     // create vertical paths from parents to children, determines the shape
     function diagonal(node, i) {
-        console.log(node)
         // need to round values first because sometimes there is an epsilon of difference between the x values. Issue not from us but how d3 renders it on the DOM.
         return ((Math.round((node.target.x + Number.EPSILON) * 100) / 100) < (Math.round((node.source.x + Number.EPSILON) * 100) / 100)) ?
             "M" + node.source.x + "," + node.source.y
