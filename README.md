@@ -17,6 +17,8 @@ This will start both an express server and the Vite server. The express server p
 
 The Vue app will run on: `http://localhost:5173`
 
+Notes: Chart can be moved around by clicking and dragging and can be zoomed by scrolling.
+
 ### Compile and Minify for Production
 
 ```sh
