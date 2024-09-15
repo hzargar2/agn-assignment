@@ -245,7 +245,8 @@ onMounted(() => {
         if (node.depth) node.children = null;
     });
 
-    collapse(root)
+    // shows first level from root if commented
+    // collapse(root)
     update(null, root);
 })
 
