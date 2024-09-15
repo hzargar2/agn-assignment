@@ -58,10 +58,7 @@ onBeforeMount(() => {
 
 <template>
 
-    <div :class="`w-[250px] h-[350px] m-auto justify-center flex flex-col p-4 gap-y-2 rounded-lg shadow-md group-hover:cursor-pointer ${background_color}`" @click="() => {
-        propsAsRefs.expanded.value = !propsAsRefs.expanded.value
-        console.log(propsAsRefs.expanded.value)
-    }">
+    <div :class="`w-[250px] h-[350px] m-auto justify-center flex flex-col p-4 gap-y-2 rounded-lg shadow-md group-hover:cursor-pointer ${background_color}`">
         <div class="flex flex-col gap-y-1 mt-0 m-auto">
             <span class="flex font-medium mx-auto text-lg">{{propsAsRefs.employee.value.data["Name"]}}</span>
             <span class="flex text-center mx-auto text-gray-600 text-lg">{{propsAsRefs.employee.value.data["Job Title"]}}</span>
