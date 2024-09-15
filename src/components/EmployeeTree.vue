@@ -52,7 +52,7 @@ onMounted(() => {
 
     const gLink = svg.append("g")
         .attr("fill", "none")
-        .attr("stroke", "#919191")
+        .attr("stroke", "#a8a8a8")
         .attr("stroke-width", 2);
 
     const gNode = svg.append("g")
@@ -83,29 +83,30 @@ onMounted(() => {
     // create vertical paths from parents to children, determines the shape
     function diagonal(node, i) {
         console.log(node)
-        return (node.target.x < node.source.x) ?
-              "M" + node.source.x + "," + node.source.y
-              // The constant is an arbitrary value that determines
-              // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
-              // of the nodes
-              + "V" + (node.target.y - vertical_separation_of_levels_in_px/20)
-              + "H" + (node.target.x + 27)
-              + "Q" + (node.target.x) + "," + (node.target.y-22) + "," + (node.target.x) + "," + (node.target.y)
-            : (node.target.x > node.source.x) ? // other node is on right side of its parent so end of curve should be in opposite direction
-              "M" + node.source.x + "," + node.source.y
-              // The constant is an arbitrary value that determines
-              // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
-              // of the nodes
-              + "V" + (node.target.y - vertical_separation_of_levels_in_px/20)
-              + "H" + (node.target.x - 27)
-              + "Q" + (node.target.x) + "," + (node.target.y-22) + "," + (node.target.x) + "," + (node.target.y)
-            : // child node is in the middle so draw a vertical line down instead of a curve
-              "M" + node.source.x + "," + node.source.y
-              + "V" + (node.target.y - vertical_separation_of_levels_in_px/20) // The constant is an arbitrary value that determines
-              // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
-              // of the nodes
-              + "H" + node.target.x
-              + "V" + node.target.y
+        // need to round values first because sometimes there is an epsilon of difference between the x values. Issue not from us but how d3 renders it on the DOM.
+        return ((Math.round((node.target.x + Number.EPSILON) * 100) / 100) < (Math.round((node.source.x + Number.EPSILON) * 100) / 100)) ?
+            "M" + node.source.x + "," + node.source.y
+            // The constant is an arbitrary value that determines
+            // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
+            // of the nodes
+            + "V" + (node.target.y - vertical_separation_of_levels_in_px/20)
+            + "H" + (node.target.x + 27)
+            + "Q" + (node.target.x) + "," + (node.target.y-22) + "," + (node.target.x) + "," + (node.target.y)
+            : ((Math.round((node.target.x + Number.EPSILON) * 100) / 100) > (Math.round((node.source.x + Number.EPSILON) * 100) / 100)) ? // other node is on right side of its parent so end of curve should be in opposite direction
+                "M" + node.source.x + "," + node.source.y
+                // The constant is an arbitrary value that determines
+                // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
+                // of the nodes
+                + "V" + (node.target.y - vertical_separation_of_levels_in_px/20)
+                + "H" + (node.target.x - 27)
+                + "Q" + (node.target.x) + "," + (node.target.y-22) + "," + (node.target.x) + "," + (node.target.y)
+                : // child node is in the middle so draw a vertical line down instead of a curve
+                "M" + node.source.x + "," + node.source.y
+                + "V" + (node.target.y - vertical_separation_of_levels_in_px/20) // The constant is an arbitrary value that determines
+                // the ratio of where the horizontal line starts on the vertical stem relative to the vertical separation
+                // of the nodes
+                + "H" + node.target.x
+                + "V" + node.target.y
     };
 
 //     function dragStarted(event) {
