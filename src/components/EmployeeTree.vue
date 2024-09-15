@@ -1,6 +1,6 @@
 <script setup>
 
-import {onMounted} from "vue";
+import {onMounted, reactive} from "vue";
 import * as d3 from "d3";
 import {createApp} from "vue";
 import Employee from "@/components/Employee.vue";
@@ -193,7 +193,7 @@ onMounted(() => {
             elm.setAttribute("width", dx);
             elm.setAttribute("height", dy);
 
-            createApp(Employee, {employee: node}).mount(elm);
+            createApp(Employee, reactive({employee: node, expanded: false})).mount(elm);
             // console.log(elm.outerHTML)
             return elm.outerHTML;
         });
